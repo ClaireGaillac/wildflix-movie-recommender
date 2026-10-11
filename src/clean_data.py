@@ -85,8 +85,10 @@ print(df_clean["Rated"].value_counts())
 df_clean["color"] = df_clean["color"].fillna("Color")
 
 # 8. Remplissage des dernières valeurs vides
+# Rated est une colonne d'affichage : "Non évalué" est une information pour le lecteur.
 df_clean["Rated"] = df_clean["Rated"].fillna("Non évalué")
-df_clean["Actors"] = df_clean["Actors"].fillna("Non actors")
+# Actors, elle, est une feature du modèle de recommandation : la remplir créerait une fausse similarité entre
+# les films sans acteurs, on laisse donc les NaN.
 
 # 9. Vérification : où reste-t-il des valeurs vides ?
 vides_restantes = df_clean.isna().sum()
