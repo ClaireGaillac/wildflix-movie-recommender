@@ -36,8 +36,7 @@ print(df_clean.info())
 colonnes_doublons_imdb = [
     "director_name", "duration", "actor_2_name", "gross", "genres", "actor_1_name", "movie_title", 
     "num_voted_users", "actor_3_name", "plot_keywords", "movie_imdb_link", "num_user_for_reviews", 
-    "language", "country", "content_rating", "budget", "title_year", "imdb_score", "imdbVotes",
-    "Year",   # on garde "year" (numérique, créé par l'équipe à partir de title_year)
+    "language", "country", "content_rating", "budget", "title_year", "imdb_score", "imdbVotes"
 ]
 df_clean = df_clean.drop(columns=colonnes_doublons_imdb)
 print(f"Après suppression des doublons IMDb : {df_clean.shape[1]} colonnes")
