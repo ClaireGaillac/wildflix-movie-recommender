@@ -7,11 +7,13 @@ model/knn_reco.joblib pour être utilisé par l'application Streamlit.
 
 import pandas as pd
 from sklearn.neighbors import NearestNeighbors
+from scipy.sparse import csr_matrix   # format creux : ne stocke que les 1
 import joblib
 
 # Chemins
 FEATURES_PATH = "data/features/movies_features.csv"
 MODEL_PATH = "model/knn_reco.joblib"
+MATRIX_PATH = "model/features_sparse.joblib"   # matrice creux pour l'app Streamlit
 
 # 1. Chargement de la matrice de features
 df_features = pd.read_csv(FEATURES_PATH)
@@ -26,11 +28,15 @@ print(f"Matrice pour le modèle : {X.shape[0]} films, {X.shape[1]} colonnes bina
 
 # 3. Entraînement du KNN : le modèle apprend "qui est proche de qui" metric="cosine" : la distance entre 
 # deux films est l'angle entre leurs vecteurs de 0 et 1 (deux films qui partagent beaucoup de 
-# genres/acteurs/réalisateurs ont des vecteurs qui pointent dans la même direction)
-model = NearestNeighbors(metric="cosine")
-model.fit(X)
-print("Modèle KNN entraîné (distance cosinus)")
+# genres/acteurs/réalisateurs/scénaristes ont des vecteurs qui pointent dans la même direction)
+X_sparse = csr_matrix(X.values)
+model = NearestNeighbors(metric="cosine", algorithm="brute")
+model.fit(X_sparse)
+print("Modèle KNN entraîné")
 
-# 4. Sauvegarde : l'app Streamlit chargera ce fichier au démarrage
+# 4. Sauvegarde
 joblib.dump(model, MODEL_PATH)
 print(f"Export : {MODEL_PATH}")
+
+joblib.dump(X_sparse, MATRIX_PATH)
+print(f"Export : {MATRIX_PATH}")

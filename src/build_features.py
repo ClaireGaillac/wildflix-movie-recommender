@@ -38,9 +38,18 @@ director_split = df_features["Director"].str.split(",", expand=True).apply(lambd
 director_dummies = pd.get_dummies(director_split.stack()).groupby(level=0).sum()
 print(f"Réalisateurs : {director_dummies.shape[1]} réalisateurs différents")
 
-# 5. Concaténation : les colonnes d'origine + les colonnes binaires
-df_features = pd.concat([df_features, genres_dummies, actors_dummies, director_dummies], axis=1)
+# 5. Transformation de Writer
+# Writer contient parfois le rôle entre parenthèses, ex : "Christopher Nolan (screenplay)". On retire les 
+# parenthèses pour que le même scénariste ne crée pas deux colonnes différentes.
+df_features["Writer"] = df_features["Writer"].str.replace(r"\(.*?\)", "", regex=True)
+writer_split = df_features["Writer"].str.split(",", expand=True).apply(lambda x: x.str.strip())
+writer_dummies = pd.get_dummies(writer_split.stack()).groupby(level=0).sum()
+print(f"Scénaristes : {writer_dummies.shape[1]} scénaristes différents")
 
-# 6. Export de la matrice de features
+# 6. Concaténation : les colonnes d'origine + les colonnes binaires
+df_features = pd.concat([df_features, genres_dummies, actors_dummies, director_dummies, writer_dummies], 
+                        axis=1)
+
+# 7. Export de la matrice de features
 df_features.to_csv(FEATURES_PATH, index=False)
-print(f"Export : {FEATURES_PATH} ({df_features.shape[0]} films, {df_features.shape[1]} colonnes)")
+print(f"Export : {FEATURES_PATH} ({df_features.shape[0]} films, {df_features.shape[1]})")
